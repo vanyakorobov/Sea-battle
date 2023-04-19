@@ -12,19 +12,27 @@ public class BattleShip {
     static int[][] monitor2 = new int[10][10];
 
     public static void main(String[] args) {
-//        System.out.println("Player#1, please enter year name:");
-//        playerName1 = scanner.nextLine();
-//        System.out.println("Player#2, please enter year name:");
-//        playerName2 = scanner.nextLine();
-//        System.out.println("-".repeat(25));
-//        System.out.println("Player#1 name: ");
-//        System.out.println(playerName1);
-//        System.out.println("Player#2 name: ");
-//        System.out.println(playerName2);
+        System.out.println("Player#1, please enter year name:");
+        playerName1 = scanner.nextLine();
+        System.out.println("Player#2, please enter year name:");
+        playerName2 = scanner.nextLine();
+        System.out.println("-".repeat(25));
+        System.out.println("Player#1 name: ");
+        System.out.println(playerName1);
+        System.out.println("Player#2 name: ");
+        System.out.println(playerName2);
         placeShips(playerName1, battleField1);
         placeShips(playerName2, battleField2);
-        makeTurn(playerName1, monitor1, battleField2); // игрок - Polly, монитор - Polly's, отображение поля - Ивана
-        makeTurn(playerName2, monitor2, battleField1); // игрок - Иван, монитор - Ивана, отображение поля - Polly's
+        while (true) {
+            makeTurn(playerName1, monitor1, battleField2); // игрок - Polly, монитор - Polly's, отображение поля - Ивана
+            if (isWinCondition()) {
+                break;
+            }
+            makeTurn(playerName2, monitor2, battleField1); // игрок - Иван, монитор - Ивана, отображение поля - Polly's
+            if (isWinCondition()) {
+                break;
+            }
+        }
     }
 
     public static void placeShips(String playerName, int[][] battleField) {
@@ -43,6 +51,11 @@ public class BattleShip {
             System.out.println("2 - Horizontal");
             int direction = scanner.nextInt();
 
+            if (!isAvailable(x, y, deck, direction, battleField)) {
+                System.out.println("Wrong coordinates!");
+                continue;
+            }
+
             for (int i = 0; i < deck; i++) {
 
                 if (direction == 1) {
@@ -54,6 +67,7 @@ public class BattleShip {
                 }
             }
             deck--;
+            clearScreen();
         }
     }
 
@@ -63,8 +77,9 @@ public class BattleShip {
         for (int i = 0; i < battleField.length; i++) {
 
             System.out.print(i + " ");
-            for (int j = 0; j < battleField[i].length; j++) {
+            for (int j = 0; j < battleField[1].length; j++) {
 
+                // получается всегда только первая строка?: [1]
                 if (battleField[j][i] == 0) { // отзеркалили - развернули на 90 градусов корабль (для человеческого
                     // представления)
                     System.out.print("- "); // пустой квадрат
@@ -87,16 +102,16 @@ public class BattleShip {
             for (int i = 0; i < monitor.length; i++) {
 
                 System.out.print(i + " ");
-                for (int j = 0; j < monitor[i].length; j++) {
+                for (int j = 0; j < monitor[1].length; j++) {
 
-                    if (monitor[j][i] == 0) {
+                    if (monitor[i][j] == 0) {
                         System.out.print("- "); // пустой квадрат
 
-                    } else if (monitor[j][i] == 1) {
+                    } else if (monitor[i][j] == 1) {
                         System.out.print("* "); // на моем экране отобразится, что в этом квадрате противника пусто
 
                     } else { // monitor[x][y] = 2; // hit
-                        System.out.println("X "); // установлен корабль (конкретно здесь - подбит/потоплен и это видно)
+                        System.out.print("X "); // установлен корабль (конкретно здесь - подбит/потоплен и это видно)
 
                     }
                 }
@@ -116,82 +131,83 @@ public class BattleShip {
                 monitor[x][y] = 1;
                 break;
             }
+            clearScreen();
         }
     }
 
-//56 минута - 2-е видео
+    //56 минута - 2-е видео
     public static boolean isWinCondition() {
-            int counter1 = 0;
-            for (int i = 0; i < monitor1.length; i++) {
-                for (int j = 0; j < monitor1[i].length; j++) {
-            if (monitor1[i][j] == 2) {
-                counter1++;
-            }
-        }
-    }
-
-            int counter2 = 0;
-            for (int i = 0; i < monitor2.length; i++) {
-                for (int j = 0; j < monitor2[i].length; j++) {
-            if (monitor2[i][j] == 2) {
-                counter2++;
-            }
+        int counter1 = 0;
+        for (int i = 0; i < monitor1.length; i++) {
+            for (int j = 0; j < monitor1[1].length; j++) {
+                if (monitor1[i][j] == 2) {
+                    counter1++;
                 }
             }
+        }
 
-            if (counter1 >= 10) {
+        int counter2 = 0;
+        for (int i = 0; i < monitor2.length; i++) {
+            for (int j = 0; j < monitor2[1].length; j++) {
+                if (monitor2[i][j] == 2) {
+                    counter2++;
+                }
+            }
+        }
+
+        if (counter1 >= 10) {
             System.out.println(playerName1 + " WIN!!!");
             return true;
-            }
-            if (counter2 >= 10) {
+        }
+        if (counter2 >= 10) {
             System.out.println(playerName2 + " WIN!!!");
             return true;
-            }
-            return false;
+        }
+        return false;
     }
 
     public static boolean isAvailable(int x, int y, int deck, int rotation, int[][] battlefield) {
         // out of bound check
-            if (rotation == 1) {
+        if (rotation == 1) {
             if (y + deck > battlefield.length) {
                 return false;
             }
-            }
-            if (rotation == 2){
-            if (x + deck > battlefield[0].length){
+        }
+        if (rotation == 2) {
+            if (x + deck > battlefield[0].length) {
                 return false;
             }
-            }
+        }
 
         //neighbours check without diagonals
         //XXXX
-        while (deck!=0){
+        while (deck != 0) {
             for (int i = 0; i < deck; i++) {
                 int xi = 0;
                 int yi = 0;
-                if (rotation == 1){
+                if (rotation == 1) {
                     yi = i;
-                } else{
+                } else {
                     xi = i;
                 }
 //                battlefield[x ][y];
-                if (x + 1 + xi < battlefield.length && x + 1 + xi >= 0){
-                    if (battlefield[x + 1 + xi][y + yi]!=0){
+                if (x + 1 + xi < battlefield.length && x + 1 + xi >= 0) {
+                    if (battlefield[x + 1 + xi][y + yi] != 0) {
                         return false;
                     }
                 }
-                if (x - 1 + xi < battlefield.length && x - 1 + xi >= 0){
-                    if (battlefield[x - 1 + xi][y + yi]!=0){
+                if (x - 1 + xi < battlefield.length && x - 1 + xi >= 0) {
+                    if (battlefield[x - 1 + xi][y + yi] != 0) {
                         return false;
                     }
                 }
-                if (y + 1 + yi < battlefield.length && y + 1 + yi >= 0){
-                    if (battlefield[x + xi][y + 1 + yi]!=0){
+                if (y + 1 + yi < battlefield.length && y + 1 + yi >= 0) {
+                    if (battlefield[x + xi][y + 1 + yi] != 0) {
                         return false;
                     }
                 }
-                if (y - 1 + yi < battlefield.length && y - 1 + yi >= 0){
-                    if (battlefield[x + xi][y - 1 + yi]!=0){
+                if (y - 1 + yi < battlefield.length && y - 1 + yi >= 0) {
+                    if (battlefield[x + xi][y - 1 + yi] != 0) {
                         return false;
                     }
                 }
@@ -201,7 +217,7 @@ public class BattleShip {
         return true;
     }
 
-    public static void clearScreen(){
+    public static void clearScreen() {
         try {
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
         } catch (InterruptedException | IOException e) {
