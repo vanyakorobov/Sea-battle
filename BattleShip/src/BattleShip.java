@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Scanner;
 
 public class BattleShip {
@@ -115,6 +116,96 @@ public class BattleShip {
                 monitor[x][y] = 1;
                 break;
             }
+        }
+    }
+
+//56 минута - 2-е видео
+    public static boolean isWinCondition() {
+            int counter1 = 0;
+            for (int i = 0; i < monitor1.length; i++) {
+                for (int j = 0; j < monitor1[i].length; j++) {
+            if (monitor1[i][j] == 2) {
+                counter1++;
+            }
+        }
+    }
+
+            int counter2 = 0;
+            for (int i = 0; i < monitor2.length; i++) {
+                for (int j = 0; j < monitor2[i].length; j++) {
+            if (monitor2[i][j] == 2) {
+                counter2++;
+            }
+                }
+            }
+
+            if (counter1 >= 10) {
+            System.out.println(playerName1 + " WIN!!!");
+            return true;
+            }
+            if (counter2 >= 10) {
+            System.out.println(playerName2 + " WIN!!!");
+            return true;
+            }
+            return false;
+    }
+
+    public static boolean isAvailable(int x, int y, int deck, int rotation, int[][] battlefield) {
+        // out of bound check
+            if (rotation == 1) {
+            if (y + deck > battlefield.length) {
+                return false;
+            }
+            }
+            if (rotation == 2){
+            if (x + deck > battlefield[0].length){
+                return false;
+            }
+            }
+
+        //neighbours check without diagonals
+        //XXXX
+        while (deck!=0){
+            for (int i = 0; i < deck; i++) {
+                int xi = 0;
+                int yi = 0;
+                if (rotation == 1){
+                    yi = i;
+                } else{
+                    xi = i;
+                }
+//                battlefield[x ][y];
+                if (x + 1 + xi < battlefield.length && x + 1 + xi >= 0){
+                    if (battlefield[x + 1 + xi][y + yi]!=0){
+                        return false;
+                    }
+                }
+                if (x - 1 + xi < battlefield.length && x - 1 + xi >= 0){
+                    if (battlefield[x - 1 + xi][y + yi]!=0){
+                        return false;
+                    }
+                }
+                if (y + 1 + yi < battlefield.length && y + 1 + yi >= 0){
+                    if (battlefield[x + xi][y + 1 + yi]!=0){
+                        return false;
+                    }
+                }
+                if (y - 1 + yi < battlefield.length && y - 1 + yi >= 0){
+                    if (battlefield[x + xi][y - 1 + yi]!=0){
+                        return false;
+                    }
+                }
+            }
+            deck--;
+        }
+        return true;
+    }
+
+    public static void clearScreen(){
+        try {
+            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
         }
     }
 }
